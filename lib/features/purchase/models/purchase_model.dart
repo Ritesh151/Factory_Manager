@@ -58,7 +58,7 @@ class PurchaseModel {
   });
 
   /// Get total quantity purchased
-  int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
+  int get totalQuantity => items.fold(0, (total, item) => total + item.quantity);
 
   factory PurchaseModel.fromMap(Map<String, dynamic> map, String documentId) {
     return PurchaseModel(

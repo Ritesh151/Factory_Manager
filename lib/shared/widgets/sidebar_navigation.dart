@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/router/app_router.dart';
 
-class SidebarNavigation extends StatelessWidget {
+class SidebarNavigation extends StatefulWidget {
   const SidebarNavigation({
     super.key,
     required this.currentPath,
@@ -12,11 +12,16 @@ class SidebarNavigation extends StatelessWidget {
   final void Function(String path) onNavigate;
 
   @override
+  State<SidebarNavigation> createState() => _SidebarNavigationState();
+}
+
+class _SidebarNavigationState extends State<SidebarNavigation> {
+  @override
   Widget build(BuildContext context) {
     return NavigationRail(
       extended: true,
       selectedIndex: _selectedIndex,
-      onDestinationSelected: (index) => onNavigate(_paths[index]),
+      onDestinationSelected: (index) => widget.onNavigate(_paths[index]),
       destinations: const [
         NavigationRailDestination(
           icon: Icon(Icons.dashboard_outlined),
@@ -74,9 +79,9 @@ class SidebarNavigation extends StatelessWidget {
   ];
 
   int get _selectedIndex {
-    final i = _paths.indexOf(currentPath);
+    final i = _paths.indexOf(widget.currentPath);
     if (i >= 0) return i;
-    if (currentPath.startsWith(RouteNames.sales)) return 2;
+    if (widget.currentPath.startsWith(RouteNames.sales)) return 2;
     return 0;
   }
 }

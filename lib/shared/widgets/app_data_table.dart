@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_spacing.dart';
-
 /// Desktop-optimized data table with fixed header and scroll.
 class AppDataTable extends StatelessWidget {
   const AppDataTable({

@@ -127,7 +127,7 @@ class ProductTile extends StatelessWidget {
                     ),
                   ),
                 Text(
-                  '${product.discount > 0 ? "${product.discount.toStringAsFixed(0)}% off" : "No discount"}',
+                  product.discount > 0 ? "${product.discount.toStringAsFixed(0)}% off" : "No discount",
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: product.discount > 0 ? colorScheme.tertiary : colorScheme.outline,
                   ),

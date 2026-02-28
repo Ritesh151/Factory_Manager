@@ -22,7 +22,7 @@ class _PurchaseFormState extends State<PurchaseForm> {
   final _notesController = TextEditingController();
   
   DateTime _purchaseDate = DateTime.now();
-  List<PurchaseItem> _items = [];
+  final List<PurchaseItem> _items = [];
   
   ProductModel? _selectedProduct;
   final _quantityController = TextEditingController(text: '1');
@@ -244,7 +244,7 @@ class _PurchaseFormState extends State<PurchaseForm> {
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               border: index < _items.length - 1 
-                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.3)))
+                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)))
                                   : null,
                             ),
                             child: Row(
@@ -318,8 +318,13 @@ class _PurchaseFormState extends State<PurchaseForm> {
 
         final products = snapshot.data!;
 
+        // Validate selected product exists in available products
+        if (_selectedProduct != null && !products.any((p) => p.id == _selectedProduct!.id)) {
+          _selectedProduct = null;
+        }
+
         return DropdownButtonFormField<ProductModel>(
-          value: _selectedProduct,
+          initialValue: _selectedProduct,
           decoration: const InputDecoration(
             labelText: 'Select Product',
             border: OutlineInputBorder(),

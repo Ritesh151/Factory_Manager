@@ -97,7 +97,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedDepartment,
+                  initialValue: _selectedDepartment,
                   decoration: const InputDecoration(
                     labelText: 'Department *',
                     border: OutlineInputBorder(),

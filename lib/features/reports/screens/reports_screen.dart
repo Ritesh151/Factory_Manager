@@ -158,7 +158,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 20),
@@ -190,7 +190,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     final isProfitable = summary.netProfit >= 0;
 
     return Card(
-      color: isProfitable ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+      color: isProfitable ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Row(
@@ -244,7 +244,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isProfitable ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                color: isProfitable ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
               ),
               child: Center(
                 child: Icon(

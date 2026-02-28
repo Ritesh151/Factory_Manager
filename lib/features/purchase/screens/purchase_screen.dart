@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import '../../../core/services/firebase_service.dart';
 import '../../../shared/widgets/section_header.dart';
-import '../../products/models/product_model.dart';
 import '../../products/services/product_service.dart';
 import '../models/purchase_model.dart';
 import '../services/purchase_service.dart';

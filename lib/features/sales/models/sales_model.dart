@@ -81,6 +81,7 @@ class SalesModel {
   final double finalAmount;
   final DateTime createdAt;
   final bool isLocked;
+  final String status;
 
   SalesModel({
     required this.id,
@@ -97,13 +98,17 @@ class SalesModel {
     required this.finalAmount,
     required this.createdAt,
     this.isLocked = false,
+    this.status = 'pending',
   });
 
   /// Calculate total GST (CGST + SGST)
   double get totalGst => totalCgst + totalSgst;
 
+  /// Get total amount (alias for finalAmount)
+  double get totalAmount => finalAmount;
+
   /// Get total quantity
-  int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
+  int get totalQuantity => items.fold(0, (total, item) => total + item.quantity);
 
   /// Amount in words (simplified)
   String get amountInWords {
@@ -130,6 +135,7 @@ class SalesModel {
       finalAmount: (map['finalAmount'] as num?)?.toDouble() ?? 0.0,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isLocked: map['isLocked'] ?? false,
+      status: map['status'] as String? ?? 'pending',
     );
   }
 
@@ -148,6 +154,7 @@ class SalesModel {
       'finalAmount': finalAmount,
       'createdAt': Timestamp.fromDate(createdAt),
       'isLocked': isLocked,
+      'status': status,
     };
   }
 
@@ -166,6 +173,7 @@ class SalesModel {
     double? finalAmount,
     DateTime? createdAt,
     bool? isLocked,
+    String? status,
   }) {
     return SalesModel(
       id: id ?? this.id,
@@ -182,6 +190,7 @@ class SalesModel {
       finalAmount: finalAmount ?? this.finalAmount,
       createdAt: createdAt ?? this.createdAt,
       isLocked: isLocked ?? this.isLocked,
+      status: status ?? this.status,
     );
   }
 }

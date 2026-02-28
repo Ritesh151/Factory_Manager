@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../models/product_model.dart';
+import '../services/product_service.dart';
 
 /// Dialog for adding or editing a product with complete fields
 class ProductDialog extends StatefulWidget {
   final ProductModel? product;
+  final ProductService productService;
 
-  const ProductDialog({super.key, this.product});
+  const ProductDialog({super.key, this.product, required this.productService});
 
   @override
   State<ProductDialog> createState() => _ProductDialogState();

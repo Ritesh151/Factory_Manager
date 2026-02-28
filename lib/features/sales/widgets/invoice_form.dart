@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../products/models/product_model.dart';
 import '../../products/services/product_service.dart';
@@ -22,7 +21,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
   final _customerGstinController = TextEditingController();
   final _extraChargesController = TextEditingController(text: '0');
 
-  List<InvoiceItem> _items = [];
+  final List<InvoiceItem> _items = [];
   ProductModel? _selectedProduct;
   final _quantityController = TextEditingController(text: '1');
 
@@ -233,7 +232,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               border: index < _items.length - 1 
-                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.3)))
+                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)))
                                   : null,
                             ),
                             child: Row(
@@ -299,7 +298,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                                     border: OutlineInputBorder(),
                                   ),
                                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  onChanged: (_) => setState(() {}),
+                                  onChanged: (_) { },
                                 ),
                               ),
                             ],
@@ -378,7 +377,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
         }
 
         return DropdownButtonFormField<ProductModel>(
-          value: _selectedProduct,
+          initialValue: _selectedProduct,
           decoration: const InputDecoration(
             labelText: 'Select Product',
             border: OutlineInputBorder(),

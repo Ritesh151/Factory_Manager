@@ -79,7 +79,7 @@ class InvoicePreview extends StatelessWidget {
                               margin: const EdgeInsets.only(top: 4),
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
+                                color: Colors.green.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: Colors.green),
                               ),
@@ -181,7 +181,7 @@ class InvoicePreview extends StatelessWidget {
                           return Container(
                             decoration: BoxDecoration(
                               border: index < sale.items.length - 1 
-                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.3)))
+                                  ? Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)))
                                   : null,
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

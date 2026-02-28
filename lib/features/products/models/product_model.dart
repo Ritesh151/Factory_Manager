@@ -67,6 +67,20 @@ class ProductModel {
   /// Check if out of stock
   bool get isOutOfStock => stock <= 0;
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ProductModel && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() {
+    return 'ProductModel(id: $id, name: $name, price: $price, stock: $stock, hsnCode: $hsnCode)';
+  }
+
   factory ProductModel.fromMap(Map<String, dynamic> map, String documentId) {
     return ProductModel(
       id: documentId,
@@ -131,10 +145,5 @@ class ProductModel {
       updatedAt: updatedAt ?? this.updatedAt,
       priceHistory: priceHistory ?? this.priceHistory,
     );
-  }
-
-  @override
-  String toString() {
-    return 'ProductModel(id: $id, name: $name, price: $price, stock: $stock, hsnCode: $hsnCode)';
   }
 }

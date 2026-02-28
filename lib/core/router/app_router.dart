@@ -9,7 +9,7 @@ import '../../features/payroll/screens/payroll_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/purchase/screens/purchase_screen.dart';
 import '../../features/reports/screens/reports_screen.dart';
-import '../../features/sales/screens/sales_screen.dart';
+import '../../features/sales/screens/sales_screen_fixed.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../router/shell_scaffold.dart';
 
@@ -46,7 +46,7 @@ GoRouter createAppRouter() {
           GoRoute(
             path: RouteNames.sales,
             pageBuilder: (_, state) => const NoTransitionPage(
-              child: SalesScreen(),
+              child: SalesScreenFixed(),
             ),
           ),
           GoRoute(

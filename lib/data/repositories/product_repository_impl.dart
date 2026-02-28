@@ -1,4 +1,3 @@
-import '../../core/constants/firebase_constants.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/remote/firestore_product_source.dart';
@@ -23,7 +22,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<List<Product>> getAll(String userId) async {
     final docs = await _source.getAll(userId);
     return docs
-        .map((d) => productFromDto(d.id, ProductDto.fromMap(d.data()!, d.id)))
+        .map((d) => productFromDto(d.id, ProductDto.fromMap(d.data(), d.id)))
         .where((p) => p.isActive)
         .toList();
   }

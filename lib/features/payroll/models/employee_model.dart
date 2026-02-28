@@ -62,7 +62,7 @@ class EmployeeModel {
   });
 
   /// Calculate total salary paid
-  double get totalPaid => paymentHistory.fold(0.0, (sum, p) => sum + p.amount);
+  double get totalPaid => paymentHistory.fold(0.0, (total, p) => total + p.amount);
 
   /// Get current month and year string
   String get _currentMonthYear {

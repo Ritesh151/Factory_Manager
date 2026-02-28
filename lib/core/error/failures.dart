@@ -25,8 +25,8 @@ class InsufficientStockFailure extends Failure {
     this.productName,
     this.requested,
     this.available,
-    super.message,
-  });
+    String? message,
+  }) : super(message);
   final String? productName;
   final int? requested;
   final int? available;

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/services/firebase_service.dart';
-import '../../products/models/product_model.dart';
 import '../../products/services/product_service.dart';
 import '../models/sales_model.dart';
 
@@ -96,7 +95,7 @@ class SalesService {
     
     // Fiscal year in India: April 1 - March 31
     if (month >= 4) {
-      return '${year}-${(year + 1).toString().substring(2)}';
+      return '$year-${(year + 1).toString().substring(2)}';
     } else {
       return '${year - 1}-${year.toString().substring(2)}';
     }
@@ -119,9 +118,9 @@ class SalesService {
       }
 
       // Calculate totals
-      final subtotal = items.fold(0.0, (sum, item) => sum + item.amount);
-      final totalCgst = items.fold(0.0, (sum, item) => sum + item.cgst);
-      final totalSgst = items.fold(0.0, (sum, item) => sum + item.sgst);
+      final subtotal = items.fold(0.0, (total, item) => total + item.amount);
+      final totalCgst = items.fold(0.0, (total, item) => total + item.cgst);
+      final totalSgst = items.fold(0.0, (total, item) => total + item.sgst);
       final rawTotal = subtotal + totalCgst + totalSgst + extraCharges;
       
       // Calculate round off

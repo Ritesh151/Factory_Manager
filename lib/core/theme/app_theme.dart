@@ -59,7 +59,7 @@ class AppTheme {
         ),
         dataTableTheme: DataTableThemeData(
           headingRowColor: WidgetStateProperty.all(
-            AppColors.surfaceContainer.withOpacity(0.5),
+            AppColors.surfaceContainer.withValues(alpha: 0.5),
           ),
           dataRowMinHeight: 40,
           dataRowMaxHeight: 48,

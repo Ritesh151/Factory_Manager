@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/firebase_service.dart';
 import '../../../shared/widgets/section_header.dart';
-import '../../products/models/product_model.dart';
 import '../../products/services/product_service.dart';
 import '../models/sales_model.dart';
 import '../services/sales_service.dart';

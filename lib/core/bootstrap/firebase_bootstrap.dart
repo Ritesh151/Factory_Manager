@@ -25,7 +25,7 @@ Future<void> bootstrap() async {
       WidgetsFlutterBinding.ensureInitialized();
       
       try {
-        // Initialize Firebase Service (skips on Linux)
+        // Initialize Firebase Service first (even on Linux for testing)
         await _initializeFirebase(isLinuxDesktop);
         
         // Run the app with ProviderScope
@@ -48,16 +48,16 @@ Future<void> bootstrap() async {
 
 /// Initialize Firebase with comprehensive error handling
 Future<void> _initializeFirebase(bool isLinuxDesktop) async {
-  // Linux desktop: Skip Firebase initialization (not supported)
-  if (isLinuxDesktop) {
-    debugPrint('Bootstrap: Linux desktop detected - skipping Firebase initialization');
-    return;
-  }
+  // Note: Initialize Firebase even on Linux for testing
+  // Firebase doesn't work on Linux desktop but we initialize for development
   
   final firebaseService = FirebaseService();
   
   try {
     await firebaseService.initialize();
+    if (isLinuxDesktop) {
+      debugPrint('Bootstrap: Linux desktop detected - Firebase initialized for testing');
+    }
   } catch (e) {
     // If Firebase fails, we can still run in offline mode
     debugPrint('WARNING: Firebase initialization failed: $e');

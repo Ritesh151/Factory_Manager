@@ -4,48 +4,63 @@ import '../../../core/services/firebase_service.dart';
 import '../../expense/services/expense_service.dart';
 import '../../payroll/services/payroll_service.dart';
 import '../../purchase/services/purchase_service.dart';
-import '../../sales/services/sales_service.dart';
+import '../../sales/repositories/sales_repository.dart';
 
 /// Service for generating business reports and analytics
+/// Clean implementation without circular dependencies
 class ReportsService {
   static final ReportsService _instance = ReportsService._internal();
   
   factory ReportsService() => _instance;
   ReportsService._internal();
 
-  late final SalesService _salesService;
-  late final PurchaseService _purchaseService;
-  late final ExpenseService _expenseService;
-  late final PayrollService _payrollService;
+  SalesRepository? _salesRepository;
+  PurchaseService? _purchaseService;
+  ExpenseService? _expenseService;
+  PayrollService? _payrollService;
 
   /// Initialize with FirebaseService
   void initialize(FirebaseService firebaseService) {
-    _salesService = SalesService();
-    _salesService.initialize(firebaseService);
+    _salesRepository = SalesRepository();
+    _salesRepository!.initialize(firebaseService);
+    
     _purchaseService = PurchaseService();
-    _purchaseService.initialize(firebaseService);
+    _purchaseService!.initialize(firebaseService);
+    
     _expenseService = ExpenseService();
-    _expenseService.initialize(firebaseService);
+    _expenseService!.initialize(firebaseService);
+    
     _payrollService = PayrollService();
-    _payrollService.initialize(firebaseService);
+    _payrollService!.initialize(firebaseService);
   }
 
-  /// Get comprehensive dashboard summary
+  /// Get comprehensive dashboard summary with parallel Firebase calls
   Future<DashboardSummary> getDashboardSummary() async {
     try {
+      if (_salesRepository == null || _purchaseService == null || 
+          _expenseService == null || _payrollService == null) {
+        throw StateError('ReportsService not initialized. Call initialize() first.');
+      }
+
       final now = DateTime.now();
       
-      // Get current month data
-      final sales = await _salesService.getMonthlySalesTotal(now.year, now.month);
-      final purchases = await _purchaseService.getMonthlyPurchaseTotal(now.year, now.month);
-      final expenses = await _expenseService.getMonthlyExpenseTotal(now.year, now.month);
-      final payroll = await _payrollService.getMonthlyPayrollTotal(now.year, now.month);
+      // Use Future.wait to parallelize all Firebase calls
+      final futures = await Future.wait([
+        _salesRepository!.getMonthlySalesTotal(now.year, now.month),
+        _purchaseService!.getMonthlyPurchaseTotal(now.year, now.month),
+        _expenseService!.getMonthlyExpenseTotal(now.year, now.month),
+        _payrollService!.getMonthlyPayrollTotal(now.year, now.month),
+        _getMonthlyGstCollected(now.year, now.month),
+      ]);
+
+      final sales = futures[0] as double;
+      final purchases = futures[1] as double;
+      final expenses = futures[2] as double;
+      final payroll = futures[3] as double;
+      final gstCollected = futures[4] as double;
 
       // Calculate net profit
       final netProfit = sales - purchases - expenses - payroll;
-
-      // Get GST collected (from sales)
-      final gstCollected = await _getMonthlyGstCollected(now.year, now.month);
 
       return DashboardSummary(
         totalSales: sales,
@@ -64,10 +79,12 @@ class ReportsService {
   /// Get GST collected for a month
   Future<double> _getMonthlyGstCollected(int year, int month) async {
     try {
+      if (_salesRepository == null) return 0.0;
+      
       final start = DateTime(year, month, 1);
       final end = DateTime(year, month + 1, 0, 23, 59, 59);
 
-      final sales = await _salesService.getSalesByDateRange(start, end);
+      final sales = await _salesRepository!.getSalesByDateRange(start, end);
       
       double totalGst = 0.0;
       for (final sale in sales) {
@@ -87,10 +104,10 @@ class ReportsService {
       final List<MonthlyData> data = [];
 
       for (int month = 1; month <= 12; month++) {
-        final sales = await _salesService.getMonthlySalesTotal(year, month);
-        final purchases = await _purchaseService.getMonthlyPurchaseTotal(year, month);
-        final expenses = await _expenseService.getMonthlyExpenseTotal(year, month);
-        final payroll = await _payrollService.getMonthlyPayrollTotal(year, month);
+        final sales = await _salesRepository?.getMonthlySalesTotal(year, month) ?? 0.0;
+        final purchases = await _purchaseService?.getMonthlyPurchaseTotal(year, month) ?? 0.0;
+        final expenses = await _expenseService?.getMonthlyExpenseTotal(year, month) ?? 0.0;
+        final payroll = await _payrollService?.getMonthlyPayrollTotal(year, month) ?? 0.0;
 
         data.add(MonthlyData(
           month: month,
@@ -114,13 +131,14 @@ class ReportsService {
   Future<Map<String, double>> getExpenseBreakdown() async {
     try {
       final now = DateTime.now();
-      return await _expenseService.getExpensesByCategoryForMonth(now.year, now.month);
+      return await _expenseService?.getExpensesByCategoryForMonth(now.year, now.month) ?? {};
     } catch (e) {
       debugPrint('ReportsService: Error getting expense breakdown: $e');
       return {};
     }
   }
 
+  /// Get month name from month number
   String _getMonthName(int month) {
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -130,7 +148,7 @@ class ReportsService {
   }
 }
 
-/// Dashboard summary data
+/// Dashboard summary data model
 class DashboardSummary {
   final double totalSales;
   final double totalPurchases;
@@ -139,7 +157,7 @@ class DashboardSummary {
   final double netProfit;
   final double gstCollected;
 
-  DashboardSummary({
+  const DashboardSummary({
     required this.totalSales,
     required this.totalPurchases,
     required this.totalExpenses,
@@ -149,13 +167,13 @@ class DashboardSummary {
   });
 
   factory DashboardSummary.zero() {
-    return DashboardSummary(
-      totalSales: 0,
-      totalPurchases: 0,
-      totalExpenses: 0,
-      totalPayroll: 0,
-      netProfit: 0,
-      gstCollected: 0,
+    return const DashboardSummary(
+      totalSales: 0.0,
+      totalPurchases: 0.0,
+      totalExpenses: 0.0,
+      totalPayroll: 0.0,
+      netProfit: 0.0,
+      gstCollected: 0.0,
     );
   }
 }
@@ -170,7 +188,7 @@ class MonthlyData {
   final double payroll;
   final double profit;
 
-  MonthlyData({
+  const MonthlyData({
     required this.month,
     required this.monthName,
     required this.sales,

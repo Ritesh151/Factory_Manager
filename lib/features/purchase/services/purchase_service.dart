@@ -62,7 +62,7 @@ class PurchaseService {
         throw ArgumentError('At least one item is required');
       }
 
-      final totalAmount = items.fold(0.0, (sum, item) => sum + item.total);
+      final totalAmount = items.fold(0.0, (total, item) => total + item.total);
 
       final purchase = PurchaseModel(
         id: '',
