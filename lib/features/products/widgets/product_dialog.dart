@@ -89,12 +89,17 @@ class _ProductDialogState extends State<ProductDialog> {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
+    // Calculate responsive width
+    final dialogWidth = size.width > 600
+        ? size.width * 0.5
+        : size.width * 0.9;
+
     return AlertDialog(
       title: Text(isEditing ? 'Edit Product' : 'Add Product'),
       content: ConstrainedBox(
         constraints: BoxConstraints(
-          minWidth: 500,
-          maxWidth: size.width * 0.5,
+          minWidth: 280,
+          maxWidth: dialogWidth,
           maxHeight: size.height * 0.8,
         ),
         child: SingleChildScrollView(

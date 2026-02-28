@@ -104,12 +104,17 @@ class _InvoiceFormState extends State<InvoiceForm> {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
+    // Calculate responsive width
+    final dialogWidth = size.width > 800
+        ? size.width * 0.8
+        : size.width * 0.95;
+
     return AlertDialog(
       title: const Text('Create GST Invoice'),
       content: ConstrainedBox(
         constraints: BoxConstraints(
-          minWidth: 700,
-          maxWidth: size.width * 0.8,
+          minWidth: 300,
+          maxWidth: dialogWidth,
           maxHeight: size.height * 0.85,
         ),
         child: Form(
@@ -372,12 +377,11 @@ class _InvoiceFormState extends State<InvoiceForm> {
         final products = snapshot.data!.where((p) => p.stock > 0).toList();
 
         // Validate selected product exists in available products
-        if (_selectedProduct != null && !products.any((p) => p.id == _selectedProduct!.id)) {
-          _selectedProduct = null;
-        }
+        final isProductValid = _selectedProduct == null || products.any((p) => p.id == _selectedProduct!.id);
+        final selectedValue = isProductValid ? _selectedProduct : null;
 
         return DropdownButtonFormField<ProductModel>(
-          initialValue: _selectedProduct,
+          initialValue: selectedValue,
           decoration: const InputDecoration(
             labelText: 'Select Product',
             border: OutlineInputBorder(),

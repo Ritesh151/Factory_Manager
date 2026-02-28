@@ -21,6 +21,7 @@ class _SalesScreenState extends ConsumerState<SalesScreenFixed> {
   late final SalesRepository _salesRepository;
   late final ProductRepository _productRepository;
   String? _errorMessage;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -32,20 +33,26 @@ class _SalesScreenState extends ConsumerState<SalesScreenFixed> {
     try {
       final firebaseService = FirebaseService();
       await firebaseService.initialize();
-      
+
       _salesRepository = SalesRepository();
       _salesRepository.initialize(firebaseService);
-      
+
       _productRepository = ProductRepository();
       _productRepository.initialize(firebaseService);
-      
-      setState(() {
-        _errorMessage = null;
-      });
+
+      if (mounted) {
+        setState(() {
+          _errorMessage = null;
+          _isInitialized = true;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+          _isInitialized = true;
+        });
+      }
       debugPrint('SalesScreen: Repository initialization failed: $e');
     }
   }
@@ -159,9 +166,11 @@ class _SalesScreenState extends ConsumerState<SalesScreenFixed> {
             
             // Sales content
             Expanded(
-              child: _errorMessage != null
-                  ? _buildOfflinePlaceholder(theme)
-                  : _buildSalesList(theme),
+              child: !_isInitialized
+                  ? _buildLoadingState()
+                  : _errorMessage != null
+                      ? _buildOfflinePlaceholder(theme)
+                      : _buildSalesList(theme),
             ),
           ],
         ),
@@ -315,6 +324,19 @@ class _SalesScreenState extends ConsumerState<SalesScreenFixed> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('Initializing sales module...'),
+        ],
+      ),
     );
   }
 
