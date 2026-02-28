@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "598420514811",
+    "project_id": "smarterp-1510",
+    "storage_bucket": "smarterp-1510.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598420514811:android:3e67c6d5132d1057830d5e",
+        "android_client_info": {
+          "package_name": "com.example.try1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEPl3nvbD50VUWKtx3AzsQ4ZcSLFztHTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

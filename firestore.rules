@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    function validProduct() {
+      return request.resource.data.keys().hasAll(['name', 'hsnCode', 'gstRate', 'price', 'stock', 'unit', 'isActive', 'createdAt', 'updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.stock is number
+        && request.resource.data.stock >= 0;
+    }
+
+    function validInvoice() {
+      return request.resource.data.keys().hasAll(['invoiceNumber', 'customer', 'lineItems', 'summary', 'isLocked', 'createdAt', 'updatedAt'])
+        && request.resource.data.invoiceNumber is string
+        && request.resource.data.summary.totalAmount is number
+        && request.resource.data.summary.totalAmount > 0
+        && request.resource.data.lineItems is list
+        && request.resource.data.lineItems.size() > 0
+        && request.resource.data.lineItems.size() <= 100
+        && request.resource.data.isLocked == true;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /profile/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /settings/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /products/{productId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validProduct();
+        allow delete: if isOwner(userId);
+      }
+      match /sales/{saleId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validInvoice();
+        allow update, delete: if false;
+      }
+      match /purchases/{purchaseId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /expenses/{expenseId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /employees/{employeeId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /salary_payments/{paymentId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
