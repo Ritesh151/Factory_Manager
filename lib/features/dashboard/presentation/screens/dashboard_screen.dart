@@ -15,6 +15,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+
   late final ReportsService _reportsService;
   DashboardSummary? _summary;
   bool _isLoading = true;
@@ -122,7 +123,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SectionHeader(title: 'Dashboard'),
+                SectionHeader(title: 'Dashboard'),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -282,7 +283,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 title: 'Net Profit',
                 value: '₹${summary.netProfit.toStringAsFixed(2)}',
                 icon: Icons.account_balance,
-                color: summary.netProfit >= 0 ? Colors.green : Colors.red,
+                color: summary.netProfit >= 0 
+                  ? Colors.green.withValues(alpha: 0.1) 
+                  : Colors.red.withValues(alpha: 0.1),
               ),
             ],
           ),
@@ -291,7 +294,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  
   Widget _buildAnimatedProfitCard(ThemeData theme, DashboardSummary summary) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),

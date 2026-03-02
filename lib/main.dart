@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'core/theme/app_theme.dart';
-import 'core/router/app_router.dart';
+import 'routes/app_routes.dart';
 import 'firebase_options.dart';
 
 /// Main application widget with proper Firebase initialization

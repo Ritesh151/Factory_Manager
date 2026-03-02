@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/firebase_service.dart';
-import '../../../shared/widgets/section_header.dart';
 import '../../products/models/product_model.dart';
 import '../../products/services/product_service.dart';
 import '../widgets/product_dialog.dart';
@@ -132,24 +131,81 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SectionHeader(title: 'Products'),
-                FilledButton.icon(
-                  onPressed: _addProduct,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Product'),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 1200, // Desktop optimized width
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: constraints.maxWidth > 1200 ? 24 : 
+                             constraints.maxWidth > 800 ? 20 : 16,
+                  vertical: 24,
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.inventory_2,
+                              color: theme.colorScheme.primary,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Products',
+                                  style: theme.textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Manage your product inventory',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          FilledButton.icon(
+                            onPressed: _addProduct,
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add Product'),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
             
             // Auto-loading products from Firestore
             Expanded(
@@ -195,29 +251,60 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   // Empty state
                   if (products.isEmpty) {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inventory_2_outlined, size: 80, color: theme.colorScheme.outline),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No products found',
-                            style: theme.textTheme.headlineSmall,
+                      child: Container(
+                        padding: const EdgeInsets.all(48),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withValues(alpha: 0.2),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Add your first product to get started',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.outline,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.inventory_2_outlined,
+                                size: 64,
+                                color: theme.colorScheme.primary,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          FilledButton.icon(
-                            onPressed: _addProduct,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add Product'),
-                          ),
-                        ],
+                            const SizedBox(height: 24),
+                            Text(
+                              'No products found',
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Add your first product to get started',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
+                            FilledButton.icon(
+                              onPressed: _addProduct,
+                              icon: const Icon(Icons.add, size: 18),
+                              label: const Text('Add Product'),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -232,21 +319,50 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                           final lowStockProducts = lowStockSnapshot.data ?? [];
                           if (lowStockProducts.isNotEmpty) {
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(16),
+                              margin: const EdgeInsets.only(bottom: 20),
+                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.errorContainer,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.3)),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: theme.colorScheme.error.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error),
-                                  const SizedBox(width: 12),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.error.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.warning_amber_rounded,
+                                      color: theme.colorScheme.error,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
                                   Expanded(
-                                    child: Text(
-                                      '${lowStockProducts.length} product(s) running low on stock',
-                                      style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Low Stock Alert',
+                                          style: theme.textTheme.titleSmall?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.onErrorContainer,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${lowStockProducts.length} product(s) running low on stock',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onErrorContainer,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -257,17 +373,33 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                         },
                       ),
                       
-                      // Product grid/list
+                      // Product grid
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: products.length,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemBuilder: (context, index) {
-                            final product = products[index];
-                            return ProductTile(
-                              product: product,
-                              onEdit: () => _editProduct(product),
-                              onDelete: () => _deleteProduct(product),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final crossAxisCount = constraints.maxWidth > 1200
+                                ? 3
+                                : constraints.maxWidth > 800
+                                    ? 2
+                                    : 1;
+
+                            return GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 20,
+                                mainAxisSpacing: 20,
+                                childAspectRatio: 1.4,
+                              ),
+                              itemCount: products.length,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              itemBuilder: (context, index) {
+                                final product = products[index];
+                                return ProductTile(
+                                  product: product,
+                                  onEdit: () => _editProduct(product),
+                                  onDelete: () => _deleteProduct(product),
+                                );
+                              },
                             );
                           },
                         ),
@@ -278,7 +410,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               ),
             ),
           ],
-        ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

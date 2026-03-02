@@ -79,160 +79,259 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SectionHeader(title: 'Sales / GST Invoices'),
-                FilledButton.icon(
-                  onPressed: _createInvoice,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create Invoice'),
-                ),
-              ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= 1200;
+          final isTablet = constraints.maxWidth >= 800;
+          
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(
+              isDesktop ? 32.0 : isTablet ? 24.0 : 16.0,
             ),
-            const SizedBox(height: 24),
-            
-            // Invoices list
-            Expanded(
-              child: StreamBuilder<List<SalesModel>>(
-                stream: _salesService.streamSales(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text('Loading invoices...'),
-                        ],
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isDesktop ? 1200 : double.infinity,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SectionHeader(title: 'Sales / GST Invoices'),
+                      FilledButton.icon(
+                        onPressed: _createInvoice,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create Invoice'),
                       ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
-                          const SizedBox(height: 16),
-                          Text('Error: ${snapshot.error}'),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () => setState(() {}),
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final sales = snapshot.data ?? [];
-
-                  if (sales.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.receipt_long_outlined, size: 80, color: theme.colorScheme.outline),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No invoices yet',
-                            style: theme.textTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Create your first GST invoice',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.outline,
+                    ],
+                  ),
+                  SizedBox(height: isDesktop ? 32.0 : 24.0),
+                  
+                  // Invoices list
+                  Expanded(
+                    child: StreamBuilder<List<SalesModel>>(
+                      stream: _salesService.streamSales(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(),
+                                const SizedBox(height: 16),
+                                Text('Loading invoices...'),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          FilledButton.icon(
-                            onPressed: _createInvoice,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Create Invoice'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                          );
+                        }
 
-                  return ListView.builder(
-                    itemCount: sales.length,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemBuilder: (context, index) {
-                      final sale = sales[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: CircleAvatar(
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            child: Text(
-                              sale.invoiceNumber.split('/').first,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            'Invoice #${sale.invoiceNumber}',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(sale.customerName),
-                              Text(
-                                '${sale.totalQuantity} items • GST: ₹${sale.totalGst.toStringAsFixed(2)}',
-                                style: theme.textTheme.bodySmall,
-                              ),
-                              Text(
-                                '${sale.createdAt.day}/${sale.createdAt.month}/${sale.createdAt.year}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.outline,
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+                                const SizedBox(height: 16),
+                                Text('Error: ${snapshot.error}'),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () => setState(() {}),
+                                  child: const Text('Retry'),
                                 ),
-                              ),
-                            ],
-                          ),
-                          trailing: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '₹${sale.finalAmount.toStringAsFixed(2)}',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
+                              ],
+                            ),
+                          );
+                        }
+
+                        final sales = snapshot.data ?? [];
+
+                        if (sales.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.receipt_long_outlined, size: 80, color: theme.colorScheme.outline),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No invoices yet',
+                                  style: theme.textTheme.headlineSmall,
                                 ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Create your first GST invoice',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.outline,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                FilledButton.icon(
+                                  onPressed: _createInvoice,
+                                  icon: const Icon(Icons.add),
+                                  label: const Text('Create Invoice'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        // Responsive grid for invoices
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final crossAxisCount = _getCrossAxisCount(constraints.maxWidth);
+                            
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: _getChildAspectRatio(constraints.maxWidth),
                               ),
-                              if (sale.isLocked)
-                                Icon(Icons.lock, size: 16, color: theme.colorScheme.outline),
-                            ],
-                          ),
-                          onTap: () => _viewInvoice(sale),
-                        ),
-                      );
-                    },
-                  );
-                },
+                              itemCount: sales.length,
+                              itemBuilder: (context, index) {
+                                final sale = sales[index];
+                                return Card(
+                                  elevation: 2,
+                                  child: InkWell(
+                                    onTap: () => _viewInvoice(sale),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Invoice number and status
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Invoice #${sale.invoiceNumber}',
+                                                  style: theme.textTheme.titleMedium?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              if (sale.isLocked)
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green.withValues(alpha: 0.1),
+                                                    borderRadius: BorderRadius.circular(6),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(Icons.lock, size: 14, color: Colors.green),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        'Locked',
+                                                        style: theme.textTheme.labelSmall?.copyWith(
+                                                          color: Colors.green,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 12),
+                                          
+                                          // Customer info
+                                          Text(
+                                            sale.customerName,
+                                            style: theme.textTheme.bodyMedium,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          
+                                          // Items and GST info
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${sale.totalQuantity} items',
+                                                      style: theme.textTheme.bodySmall?.copyWith(
+                                                        color: theme.colorScheme.outline,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'GST: ₹${sale.totalGst.toStringAsFixed(2)}',
+                                                      style: theme.textTheme.bodySmall?.copyWith(
+                                                        color: theme.colorScheme.outline,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Text(
+                                                '${sale.createdAt.day}/${sale.createdAt.month}/${sale.createdAt.year}',
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  color: theme.colorScheme.outline,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 12),
+                                          
+                                          // Amount
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Total Amount',
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  color: theme.colorScheme.outline,
+                                                ),
+                                              ),
+                                              Text(
+                                                '₹${sale.finalAmount.toStringAsFixed(2)}',
+                                                style: theme.textTheme.titleMedium?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: theme.colorScheme.primary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  int _getCrossAxisCount(double width) {
+    if (width >= 1200) return 3;
+    if (width >= 800) return 2;
+    return 1;
+  }
+
+  double _getChildAspectRatio(double width) {
+    if (width >= 1200) return 1.4;
+    if (width >= 800) return 1.3;
+    return 1.2;
   }
 }

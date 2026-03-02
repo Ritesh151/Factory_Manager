@@ -10,69 +10,34 @@ class AppTheme {
 
   static ThemeData get light => ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.light(
+        scaffoldBackgroundColor: AppColors.backgroundDark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.dark,
           primary: AppColors.primary,
-          onPrimary: AppColors.onPrimary,
-          primaryContainer: AppColors.primaryContainer,
-          onPrimaryContainer: AppColors.onPrimaryContainer,
           secondary: AppColors.secondary,
-          onSecondary: AppColors.onSecondary,
-          secondaryContainer: AppColors.secondaryContainer,
-          onSecondaryContainer: AppColors.onSecondaryContainer,
-          surface: AppColors.surface,
-          onSurface: AppColors.onSurface,
-          surfaceContainerHighest: AppColors.surfaceContainer,
-          onSurfaceVariant: AppColors.onSurfaceVariant,
+          surface: AppColors.surfaceGlass,
+          background: AppColors.backgroundDark,
           error: AppColors.error,
-          onError: AppColors.onError,
-          outline: AppColors.outline,
+          outline: AppColors.border,
         ),
         textTheme: AppTypography.textTheme,
-        cardTheme: CardThemeData(
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(AppSpacing.sm),
-          clipBehavior: Clip.antiAlias,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        dataTableTheme: DataTableThemeData(
-          headingRowColor: WidgetStateProperty.all(
-            AppColors.surfaceContainer.withValues(alpha: 0.5),
-          ),
-          dataRowMinHeight: 40,
-          dataRowMaxHeight: 48,
-        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        // default corner radius 20
+        // cardTheme removed to avoid SDK type mismatch across Flutter versions
       );
 
   static ThemeData get dark => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
+        scaffoldBackgroundColor: AppColors.backgroundDark,
         colorScheme: ColorScheme.dark(
-          primary: AppColors.primaryDark,
-          surface: AppColors.surfaceDark,
-          onSurface: AppColors.onSurfaceDark,
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          surface: AppColors.surfaceGlass,
+          background: AppColors.backgroundDark,
+          error: AppColors.error,
+          outline: AppColors.border,
         ),
         textTheme: AppTypography.textTheme,
       );

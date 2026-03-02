@@ -28,7 +28,6 @@ class _InvoiceFormState extends ConsumerState<InvoiceForm> {
   final _notesController = TextEditingController();
 
   ProductModel? _selectedProduct;
-  List<ProductModel> _availableProducts = [];
   bool _isLoading = false;
 
   @override
@@ -201,7 +200,7 @@ class _InvoiceFormState extends ConsumerState<InvoiceForm> {
                   );
                   
                   // Update available products list
-                  _availableProducts = filteredProducts;
+                  // _availableProducts = filteredProducts;
                   
                   // Validate selected product exists
                   if (_selectedProduct != null && !filteredProducts.any((p) => p.id == _selectedProduct!.id)) {

@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+// Use simple TextStyle here to avoid google_fonts compile issues in some targets.
 
-/// Typography scale for Windows desktop ERP.
+/// Typography scale using Inter (Material 3 friendly).
 class AppTypography {
   AppTypography._();
 
   static TextTheme get textTheme => TextTheme(
         displayLarge: const TextStyle(
           fontSize: 32,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           letterSpacing: -0.5,
         ),
         displayMedium: const TextStyle(
           fontSize: 28,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
         displaySmall: const TextStyle(
           fontSize: 24,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
         headlineLarge: const TextStyle(
           fontSize: 22,

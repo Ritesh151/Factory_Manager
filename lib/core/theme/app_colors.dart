@@ -4,19 +4,29 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary
-  static const Color primary = Color(0xFF1565C0);
-  static const Color primaryContainer = Color(0xFFBBDEFB);
+  // Primary / brand
+  static const Color primary = Color(0xFF6366F1);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color onPrimaryContainer = Color(0xFF0D47A1);
 
   // Secondary
-  static const Color secondary = Color(0xFF37474F);
-  static const Color secondaryContainer = Color(0xFFCFD8DC);
+  static const Color secondary = Color(0xFF8B5CF6);
   static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color onSecondaryContainer = Color(0xFF263238);
 
-  // Surface
+  // Accent glow
+  static const Color accentGlow = Color(0xFF22D3EE);
+
+  // Dark background / glass surfaces
+  static const Color backgroundDark = Color(0xFF0F172A);
+  static const Color surfaceGlass = Color(0xFF1E293B);
+
+  // Borders (not const due to opacity, use getter)
+  static Color get border => Colors.white.withOpacity(0.08);
+
+  // Legacy values (kept for compatibility, but not used)
+  static const Color primaryContainer = Color(0xFFBBDEFB);
+  static const Color onPrimaryContainer = Color(0xFF0D47A1);
+  static const Color secondaryContainer = Color(0xFFCFD8DC);
+  static const Color onSecondaryContainer = Color(0xFF263238);
   static const Color surface = Color(0xFFFAFAFA);
   static const Color surfaceDim = Color(0xFFEEEEEE);
   static const Color surfaceContainer = Color(0xFFF5F5F5);
