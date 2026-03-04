@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-
 import '../../firebase_options.dart';
 
 /// Service responsible for Firebase Core and Firestore operations.
@@ -21,67 +20,29 @@ class FirebaseService {
   /// Returns true if Firebase has been initialized
   bool get isInitialized => _initialized;
   
-  /// Returns true if Firebase is currently being initialized
-  bool get isInitializing => _initializing;
-  
-  /// Get Firestore instance with caching
+  /// Get Firestore instance safely without throwing crashes
   FirebaseFirestore get firestore {
-    if (!_initialized) {
-      debugPrint('FirebaseService: Not initialized, attempting to initialize...');
-      _initializeSync();
-    }
-    
     if (_firestoreInstance != null) {
       return _firestoreInstance!;
     }
     
     try {
+      // If Firebase isn't initialized yet, try to get instance anyway
+      // but don't throw StateError. Let the UI handle the connection state.
       _firestoreInstance = FirebaseFirestore.instance;
       return _firestoreInstance!;
     } catch (e) {
-      debugPrint('FirebaseService: Error accessing Firestore: $e');
-      throw StateError('Firestore not available. Running in offline mode.');
-    }
-  }
-  
-  /// Synchronous initialization for immediate access
-  void _initializeSync() {
-    if (_initializing || _initialized) return;
-    
-    if (Firebase.apps.isNotEmpty) {
-      debugPrint('FirebaseService: Firebase.apps not empty, marking as initialized');
-      _initialized = true;
-      
-      // Configure Firestore settings
-      _configureFirestoreSettings();
-    }
-  }
-  
-  /// Configure Firestore settings
-  void _configureFirestoreSettings() {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      firestore.settings = const Settings(
-        persistenceEnabled: true,
-        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-      );
-      _firestoreInstance = firestore;
-    } catch (e) {
-      debugPrint('FirebaseService: Failed to configure Firestore settings: $e');
+      debugPrint('FirebaseService: Firestore instance not available yet: $e');
+      // Return a temporary instance if possible, or handle via StreamBuilder in UI
+      return FirebaseFirestore.instance;
     }
   }
   
   /// Initialize Firebase safely with proper error handling
-  /// Can be called multiple times - only initializes once
   Future<void> initialize() async {
-    if (_initialized) {
-      debugPrint('FirebaseService: Already initialized, skipping...');
-      return;
-    }
+    if (_initialized) return;
     
     if (_initializing) {
-      debugPrint('FirebaseService: Already initializing, waiting...');
-      // Wait for initialization to complete
       while (_initializing) {
         await Future.delayed(const Duration(milliseconds: 100));
       }
@@ -91,56 +52,37 @@ class FirebaseService {
     _initializing = true;
     
     try {
-      debugPrint('FirebaseService: Initializing Firebase...');
+      debugPrint('FirebaseService: Starting initialization for ${kIsWeb ? "Web" : "Native"}...');
       
-      // Check if Firebase is already initialized
-      if (Firebase.apps.isNotEmpty) {
-        debugPrint('FirebaseService: Firebase.apps not empty, marking as initialized');
-        _initialized = true;
-        _configureFirestoreSettings();
-        return;
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
       }
       
-      // Initialize Firebase with timeout
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw TimeoutException('Firebase initialization timed out');
-        },
+      // Configure Firestore settings
+      final firestore = FirebaseFirestore.instance;
+      
+      firestore.settings = Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
       
-      // Configure Firestore settings for offline persistence
-      _configureFirestoreSettings();
-      
+      _firestoreInstance = firestore;
       _initialized = true;
-      debugPrint('FirebaseService: Firebase initialized successfully with offline persistence');
+      debugPrint('FirebaseService: Initialized successfully');
     } catch (e) {
-      debugPrint('FirebaseService: Failed to initialize Firebase: $e');
-      debugPrint('FirebaseService: This is expected on Linux desktop - continuing in offline mode');
-      
-      // Don't rethrow - allow app to continue in offline mode
-      // Mark as initialized to prevent repeated attempts
-      _initialized = true;
+      debugPrint('FirebaseService: Initialization failed: $e');
+      // We don't mark as _initialized = true on error to allow retry 
+      // but we do set _initializing to false in finally
     } finally {
       _initializing = false;
     }
   }
   
-  /// Reset the service (useful for testing)
   void reset() {
     _initialized = false;
     _initializing = false;
     _firestoreInstance = null;
   }
-}
-
-/// Timeout exception for Firebase operations
-class TimeoutException implements Exception {
-  final String message;
-  TimeoutException(this.message);
-  
-  @override
-  String toString() => 'TimeoutException: $message';
 }

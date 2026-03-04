@@ -24,15 +24,15 @@ class DesignSystem {
 
   // Elevation shadows tuned for desktop
   static List<BoxShadow> cardShadow({Color? color}) {
-    final shadowColor = color ?? Colors.black.withOpacity(0.45);
+    final shadowColor = color ?? Colors.black.withValues(alpha: 0.45);
     return [
       BoxShadow(
-        color: shadowColor.withOpacity(0.18),
+        color: shadowColor.withValues(alpha: 0.18),
         offset: const Offset(0, 6),
         blurRadius: 24,
       ),
       BoxShadow(
-        color: shadowColor.withOpacity(0.08),
+        color: shadowColor.withValues(alpha: 0.08),
         offset: const Offset(0, 2),
         blurRadius: 6,
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class LoadingWidget extends StatelessWidget {
   final String message;
 
-  const LoadingWidget({Key? key, this.message = 'Loading...'}) : super(key: key);
+  const LoadingWidget({super.key, this.message = 'Loading...'});
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +33,13 @@ class EmptyStateWidget extends StatelessWidget {
   final String? actionLabel;
 
   const EmptyStateWidget({
-    Key? key,
+    super.key,
     required this.title,
     this.description,
     this.icon = Icons.inbox,
     this.onAction,
     this.actionLabel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +88,11 @@ class ErrorWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
   const ErrorWidget({
-    Key? key,
+    super.key,
     required this.title,
     this.description,
     this.onRetry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

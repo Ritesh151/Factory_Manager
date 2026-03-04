@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
-import '../../domain/entities/invoice_entity.dart';
+import '../../../domain/entities/invoice_entity.dart';
+import '../../constants/company_info.dart';
+import 'pdf_font_service.dart';
 
 /// Service for generating professional invoice PDFs
 class InvoicePdfService {
@@ -70,7 +72,7 @@ class InvoicePdfService {
           pw.SizedBox(height: 30),
 
           // Notes
-          if (invoice.notes.isNotEmpty) _buildNotes(invoice),
+          if (invoice.notes != null && invoice.notes!.isNotEmpty) _buildNotes(invoice),
 
           // Footer
           pw.Spacer(),
@@ -89,16 +91,31 @@ class InvoicePdfService {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'SMARTERP',
-              style: pw.TextStyle(
+              CompanyInfo.name,
+              style: PdfFontService.createTextStyle(
                 fontSize: 32,
                 fontWeight: pw.FontWeight.bold,
               ),
             ),
             pw.SizedBox(height: 5),
             pw.Text(
-              'Your Business Solutions',
-              style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+              CompanyInfo.address,
+              style: PdfFontService.createTextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            pw.SizedBox(height: 2),
+            pw.Text(
+              'Email: ${CompanyInfo.email}',
+              style: PdfFontService.createTextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            pw.SizedBox(height: 2),
+            pw.Text(
+              'Phone: ${CompanyInfo.formattedPhone}',
+              style: PdfFontService.createTextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            pw.SizedBox(height: 2),
+            pw.Text(
+              'GSTIN: ${CompanyInfo.gstin}',
+              style: PdfFontService.createTextStyle(fontSize: 10, color: PdfColors.grey700),
             ),
           ],
         ),
@@ -107,7 +124,7 @@ class InvoicePdfService {
           children: [
             pw.Text(
               'INVOICE',
-              style: pw.TextStyle(
+              style: PdfFontService.createTextStyle(
                 fontSize: 28,
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.blue,
@@ -144,7 +161,7 @@ class InvoicePdfService {
               ),
               child: pw.Text(
                 'Status: ${invoice.status.toUpperCase()}',
-                style: pw.TextStyle(
+                style: PdfFontService.createTextStyle(
                   fontWeight: pw.FontWeight.bold,
                   color: _getStatusColor(invoice.status),
                 ),
@@ -167,7 +184,7 @@ class InvoicePdfService {
             children: [
               pw.Text(
                 'BILL TO:',
-                style: pw.TextStyle(
+                style: PdfFontService.createTextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
                 ),
@@ -175,13 +192,13 @@ class InvoicePdfService {
               pw.SizedBox(height: 8),
               pw.Text(
                 invoice.customerName,
-                style: const pw.TextStyle(
+                style: PdfFontService.createTextStyle(
                   fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
-              pw.Text(invoice.customerEmail, style: const pw.TextStyle(fontSize: 10)),
-              pw.Text(invoice.customerPhone, style: const pw.TextStyle(fontSize: 10)),
+              pw.Text(invoice.customerEmail, style: PdfFontService.createTextStyle(fontSize: 10)),
+              pw.Text(CompanyInfo.formattedPhone, style: PdfFontService.createTextStyle(fontSize: 10)),
             ],
           ),
         ),
@@ -191,21 +208,21 @@ class InvoicePdfService {
             children: [
               pw.Text(
                 'FROM:',
-                style: pw.TextStyle(
+                style: PdfFontService.createTextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
               pw.SizedBox(height: 8),
               pw.Text(
-                'SmartERP Business',
-                style: const pw.TextStyle(
+                CompanyInfo.name,
+                style: PdfFontService.createTextStyle(
                   fontSize: 14,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
-              pw.Text('business@smarterp.com', style: const pw.TextStyle(fontSize: 10)),
-              pw.Text('+1 (555) 123-4567', style: const pw.TextStyle(fontSize: 10)),
+              pw.Text(CompanyInfo.email, style: PdfFontService.createTextStyle(fontSize: 10)),
+              pw.Text(CompanyInfo.formattedPhone, style: PdfFontService.createTextStyle(fontSize: 10)),
             ],
           ),
         ),
@@ -215,7 +232,11 @@ class InvoicePdfService {
 
   /// Build items table with headers and rows
   static pw.Widget _buildItemsTable(InvoiceEntity invoice) {
-    final currencyFormat = NumberFormat.simpleCurrency(locale: 'en_US');
+    final currencyFormat = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹',
+      decimalDigits: 2,
+    );
 
     return pw.Column(
       children: [
@@ -235,7 +256,7 @@ class InvoicePdfService {
                 flex: 3,
                 child: pw.Text(
                   'Description',
-                  style: pw.TextStyle(
+                  style: PdfFontService.createTextStyle(
                     color: PdfColors.white,
                     fontWeight: pw.FontWeight.bold,
                   ),
@@ -245,7 +266,7 @@ class InvoicePdfService {
                 child: pw.Text(
                   'Qty',
                   textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(
+                  style: PdfFontService.createTextStyle(
                     color: PdfColors.white,
                     fontWeight: pw.FontWeight.bold,
                   ),
@@ -255,7 +276,7 @@ class InvoicePdfService {
                 child: pw.Text(
                   'Unit Price',
                   textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(
+                  style: PdfFontService.createTextStyle(
                     color: PdfColors.white,
                     fontWeight: pw.FontWeight.bold,
                   ),
@@ -265,7 +286,7 @@ class InvoicePdfService {
                 child: pw.Text(
                   'Total',
                   textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(
+                  style: PdfFontService.createTextStyle(
                     color: PdfColors.white,
                     fontWeight: pw.FontWeight.bold,
                   ),
@@ -302,11 +323,11 @@ class InvoicePdfService {
                       children: [
                         pw.Text(
                           item.productName,
-                          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          style: PdfFontService.createTextStyle(fontWeight: pw.FontWeight.bold),
                         ),
                         pw.Text(
                           'Tax: ${item.taxRate.toStringAsFixed(1)}%',
-                          style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                          style: PdfFontService.createTextStyle(fontSize: 8, color: PdfColors.grey700),
                         ),
                       ],
                     ),
@@ -327,7 +348,7 @@ class InvoicePdfService {
                     child: pw.Text(
                       currencyFormat.format(item.total),
                       textAlign: pw.TextAlign.right,
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      style: PdfFontService.createTextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
                 ],
@@ -341,7 +362,11 @@ class InvoicePdfService {
 
   /// Build totals section
   static pw.Widget _buildTotals(InvoiceEntity invoice) {
-    final currencyFormat = NumberFormat.simpleCurrency(locale: 'en_US');
+    final currencyFormat = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹',
+      decimalDigits: 2,
+    );
 
     return pw.Align(
       alignment: pw.Alignment.centerRight,
@@ -378,18 +403,19 @@ class InvoicePdfService {
       children: [
         pw.Text(
           'Notes:',
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          style: PdfFontService.createTextStyle(fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 5),
         pw.Container(
+          width: double.infinity,
+          padding: const pw.EdgeInsets.all(8),
           decoration: pw.BoxDecoration(
             border: pw.Border.all(color: PdfColors.grey300),
-            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(5)),
           ),
-          padding: const pw.EdgeInsets.all(8),
           child: pw.Text(
-            invoice.notes,
-            style: const pw.TextStyle(fontSize: 10),
+            invoice.notes ?? '',
+            style: PdfFontService.createTextStyle(fontSize: 10),
           ),
         ),
       ],
@@ -410,12 +436,12 @@ class InvoicePdfService {
         children: [
           pw.Text(
             'Thank you for your business!',
-            style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+            style: PdfFontService.createTextStyle(fontSize: 10, color: PdfColors.grey700),
           ),
           pw.SizedBox(height: 5),
           pw.Text(
             'Generated by SmartERP',
-            style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
+            style: PdfFontService.createTextStyle(fontSize: 8, color: PdfColors.grey500),
           ),
         ],
       ),
@@ -428,7 +454,7 @@ class InvoicePdfService {
       padding: const pw.EdgeInsets.symmetric(vertical: 3),
       child: pw.Row(
         children: [
-          pw.Text(label, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          pw.Text(label, style: PdfFontService.createTextStyle(fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(width: 10),
           pw.Text(value),
         ],
@@ -450,14 +476,14 @@ class InvoicePdfService {
         children: [
           pw.Text(
             label,
-            style: pw.TextStyle(
+            style: PdfFontService.createTextStyle(
               fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
               fontSize: isTotal ? 12 : 11,
             ),
           ),
           pw.Text(
             value,
-            style: pw.TextStyle(
+            style: PdfFontService.createTextStyle(
               fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
               fontSize: isTotal ? 14 : 11,
               color: isTotal ? PdfColors.blue : PdfColors.black,

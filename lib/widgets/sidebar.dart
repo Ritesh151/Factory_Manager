@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/router/app_router.dart';
+import '../routes/app_routes.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({
@@ -25,6 +26,7 @@ class _SidebarState extends State<Sidebar> {
     _SidebarItem('Dashboard', Icons.dashboard_outlined, RouteNames.dashboard),
     _SidebarItem('Products', Icons.inventory_2_outlined, RouteNames.products),
     _SidebarItem('Sales', Icons.receipt_long_outlined, RouteNames.sales),
+    _SidebarItem('Invoices', Icons.description_outlined, RouteNames.createInvoice),
     _SidebarItem('Purchases', Icons.shopping_cart_outlined, RouteNames.purchases),
     _SidebarItem('Expenses', Icons.payments_outlined, RouteNames.expenses),
     _SidebarItem('Payroll', Icons.badge_outlined, RouteNames.payroll),

@@ -55,7 +55,7 @@ class DesignSystem {
     double blurRadius = 10.0,
   }) =>
       BoxDecoration(
-        color: AppColors.surfaceGlass.withOpacity(0.8),
+        color: AppColors.surfaceGlass.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: borderColor,
@@ -79,8 +79,8 @@ class DesignSystem {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.glassSemiTransparent.withOpacity(0.7),
-                AppColors.glassLight.withOpacity(0.3),
+                AppColors.glassSemiTransparent.withValues(alpha: 0.7),
+                AppColors.glassLight.withValues(alpha: 0.3),
               ],
             ),
             borderRadius: BorderRadius.circular(borderRadius),

@@ -14,6 +14,8 @@ import '../pages/sales_page.dart';
 import '../pages/settings_page.dart';
 import '../pages/transactions_page.dart';
 import '../core/router/shell_scaffold.dart';
+import '../features/invoice/ui/screens/create_invoice_page.dart';
+import '../features/invoice/ui/screens/invoice_preview_page.dart';
 
 final GlobalKey<NavigatorState> _rootKey = GlobalKey<NavigatorState>();
 
@@ -80,6 +82,14 @@ GoRouter createAppRouter() => GoRouter(
               path: RouteNames.settings,
               pageBuilder: (_, state) => NoTransitionPage(child: const SettingsPage()),
             ),
+            GoRoute(
+              path: RouteNames.createInvoice,
+              pageBuilder: (_, state) => NoTransitionPage(child: const CreateInvoicePage()),
+            ),
+            GoRoute(
+              path: RouteNames.invoicePreview,
+              pageBuilder: (_, state) => NoTransitionPage(child: const InvoicePreviewPage()),
+            ),
           ],
         ),
       ],
@@ -99,4 +109,6 @@ class RouteNames {
   static const String payroll = '/payroll';
   static const String reports = '/reports';
   static const String settings = '/settings';
+  static const String createInvoice = '/invoice/create';
+  static const String invoicePreview = '/invoice/preview';
 }

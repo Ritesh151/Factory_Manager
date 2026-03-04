@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_typography.dart';
-import '../../design/design_system.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
+import '../design/design_system.dart';
 
 /// KPI card designed for enterprise dashboard.
 class KpiCard extends StatelessWidget {

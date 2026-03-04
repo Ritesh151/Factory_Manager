@@ -39,7 +39,11 @@ class _DataGridState extends State<DataGrid> {
 
   void _onSelectChanged(bool? value, int index) {
     setState(() {
-      if (value == true) _selected.add(index); else _selected.remove(index);
+      if (value == true) {
+        _selected.add(index);
+      } else {
+        _selected.remove(index);
+      }
     });
     widget.controller?.onSelectionChanged?.call(_selected.toList());
   }
@@ -53,8 +57,8 @@ class _DataGridState extends State<DataGrid> {
         child: DataTable(
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
-          headingRowColor: MaterialStateProperty.all(Colors.white10),
-          dataRowColor: MaterialStateProperty.resolveWith((states) => Colors.white.withOpacity(0.02)),
+          headingRowColor: WidgetStateProperty.all(Colors.white10),
+          dataRowColor: WidgetStateProperty.resolveWith((states) => Colors.white.withValues(alpha: 0.02)),
           columns: [
             if (widget.selectable) DataColumn(label: const SizedBox(width: 12)),
             ...widget.columns.asMap().entries.map(

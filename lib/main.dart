@@ -1,102 +1,63 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'core/theme/app_theme.dart';
-import 'routes/app_routes.dart';
-import 'firebase_options.dart';
+import 'core/router/app_router.dart';
+import 'core/constants/app_constants.dart';
+import 'core/services/firebase_service.dart';
 
-/// Main application widget with proper Firebase initialization
-/// Ensures single Firebase instance and prevents duplicate app errors
-class SmartErpApp extends ConsumerWidget {
-  const SmartErpApp({super.key});
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase before app starts
+  try {
+    await FirebaseService().initialize();
+  } catch (e) {
+    debugPrint('Firebase initialization failed during startup: $e');
+  }
+  
+  // Configure Windows window (desktop only) - temporarily disabled for web compatibility
+  // if (!kIsWeb) {
+  //   try {
+  //     await windowManager.ensureInitialized();
+      
+  //     WindowOptions windowOptions = const WindowOptions(
+  //       size: Size(1200, 800),
+  //       center: true,
+  //       backgroundColor: Colors.white,
+  //       skipTaskbar: false,
+  //       titleBarStyle: TitleBarStyle.hidden,
+  //       title: AppConstants.appName,
+  //     );
+      
+  //     await windowManager.waitUntilReadyToShow(windowOptions);
+  //     await windowManager.show();
+  //     await windowManager.focus();
+  //   } catch (e) {
+  //     // Window manager failed, continue without it
+  //     print('Window manager initialization failed: $e');
+  //   }
+  // }
+
+  runApp(
+    const ProviderScope(
+      child: SmartERPApp(),
+    ),
+  );
+}
+
+class SmartERPApp extends ConsumerWidget {
+  const SmartERPApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'SmartERP',
-      theme: AppTheme.light,
-      routerConfig: createAppRouter(),
+      title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      routerConfig: AppRouter.router,
+      builder: (context, child) {
+        return child ?? const SizedBox();
+      },
     );
   }
-}
-
-/// Bootstrap function for proper app initialization
-/// Handles Firebase initialization with duplicate prevention
-Future<void> bootstrap() async {
-  // Ensure Flutter binding is initialized first
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  try {
-    // Initialize Firebase only if no apps exist
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-      debugPrint('Firebase initialized successfully');
-    } else {
-      debugPrint('Firebase already initialized, skipping...');
-    }
-    
-    // Configure Firestore settings for offline persistence
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-    );
-    
-    // Run app with proper error handling
-    runApp(
-      const ProviderScope(
-        child: SmartErpApp(),
-      ),
-    );
-  } catch (e, stackTrace) {
-    debugPrint('Fatal error during initialization: $e');
-    debugPrint('Stack trace: $stackTrace');
-    
-    // Show error screen on initialization failure
-    runApp(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 64),
-                const SizedBox(height: 16),
-                const Text(
-                  'Failed to initialize SmartERP',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'Please check your internet connection and try again.',
-                    style: TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // Retry initialization
-                    bootstrap();
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-void main() {
-  bootstrap();
 }
