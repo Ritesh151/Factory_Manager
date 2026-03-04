@@ -12,6 +12,7 @@ import '../pages/purchases_page.dart';
 import '../pages/reports_page.dart';
 import '../pages/sales_page.dart';
 import '../pages/settings_page.dart';
+import '../pages/transactions_page.dart';
 import '../core/router/shell_scaffold.dart';
 
 final GlobalKey<NavigatorState> _rootKey = GlobalKey<NavigatorState>();
@@ -60,6 +61,10 @@ GoRouter createAppRouter() => GoRouter(
               pageBuilder: (_, state) => NoTransitionPage(child: const PurchasesPage()),
             ),
             GoRoute(
+              path: RouteNames.transactions,
+              pageBuilder: (_, state) => NoTransitionPage(child: const TransactionsPage()),
+            ),
+            GoRoute(
               path: RouteNames.expenses,
               pageBuilder: (_, state) => NoTransitionPage(child: const ExpensesPage()),
             ),
@@ -89,6 +94,7 @@ class RouteNames {
   static const String productDetail = '/products/detail';
   static const String sales = '/sales';
   static const String purchases = '/purchases';
+  static const String transactions = '/transactions';
   static const String expenses = '/expenses';
   static const String payroll = '/payroll';
   static const String reports = '/reports';

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/layout/app_layout.dart';
+import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/status_badge.dart';
+import '../../../../core/widgets/data_grid.dart';
 import '../../domain/entities/product_entity.dart';
 import '../providers/product_providers.dart';
 import '../widgets/product_grid.dart';
@@ -75,25 +79,27 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     final productsAsyncValue = ref.watch(allProductsStreamProvider);
+    final body = productsAsyncValue.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => _buildErrorState(context, error),
+      data: (products) => _buildProductsView(context, products),
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Products'),
-        elevation: 0,
-      ),
-      body: productsAsyncValue.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => _buildErrorState(context, error),
-        data: (products) => _buildProductsView(context, products),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Navigate to add product screen
-        },
-        tooltip: 'Add Product',
-        child: const Icon(Icons.add_rounded),
+    return AppLayout(
+      title: 'Products',
+      child: Stack(
+        children: [
+          Positioned.fill(child: body),
+          Positioned(
+            right: 24,
+            bottom: 24,
+            child: FloatingActionButton(
+              onPressed: () => _showAddEditDialog(context),
+              tooltip: 'Add Product',
+              child: const Icon(Icons.add_rounded),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -287,9 +293,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Navigate to add product screen
-            },
+            onPressed: () => _showAddEditDialog(context),
             icon: const Icon(Icons.add_rounded),
             label: const Text('Add Product'),
           ),
@@ -344,16 +348,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
   }
 
   void _editProduct(ProductEntity product) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Edit product - Coming soon'),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          onPressed: () {},
-        ),
-      ),
-    );
-    // TODO: Navigate to edit screen
+    _showAddEditDialog(context, existing: product);
   }
 
   void _deleteProduct(ProductEntity product) {
@@ -370,21 +365,99 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Delete product - Coming soon'),
-                  action: SnackBarAction(
-                    label: 'Dismiss',
-                    onPressed: () {},
-                  ),
-                ),
-              );
-              // TODO: Delete product
+              _performDelete(product);
             },
             child: const Text(
               'Delete',
               style: TextStyle(color: Colors.red),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performDelete(ProductEntity product) async {
+    final repo = ref.read(productRepositoryProvider);
+    try {
+      await repo.deleteProduct(product.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product deleted')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete: $e')));
+      }
+    }
+  }
+
+  Future<void> _showAddEditDialog(BuildContext context, {ProductEntity? existing}) async {
+    final repo = ref.read(productRepositoryProvider);
+    final nameCtl = TextEditingController(text: existing?.name ?? '');
+    final skuCtl = TextEditingController(text: existing?.sku ?? '');
+    final priceCtl = TextEditingController(text: existing != null ? existing.price.toString() : '0');
+    final qtyCtl = TextEditingController(text: existing != null ? existing.quantity.toString() : '0');
+
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(existing == null ? 'Add Product' : 'Edit Product'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(controller: nameCtl, decoration: const InputDecoration(labelText: 'Name'), validator: (v) => (v == null || v.isEmpty) ? 'Required' : null),
+                TextFormField(controller: skuCtl, decoration: const InputDecoration(labelText: 'SKU')),
+                TextFormField(controller: priceCtl, decoration: const InputDecoration(labelText: 'Price'), keyboardType: TextInputType.numberWithOptions(decimal: true)),
+                TextFormField(controller: qtyCtl, decoration: const InputDecoration(labelText: 'Quantity'), keyboardType: TextInputType.number),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
+              final name = nameCtl.text.trim();
+              final sku = skuCtl.text.trim();
+              final price = double.tryParse(priceCtl.text) ?? 0.0;
+              final qty = int.tryParse(qtyCtl.text) ?? 0;
+
+              try {
+                if (existing == null) {
+                  final newProduct = ProductEntity(
+                    id: '',
+                    name: name,
+                    description: '',
+                    price: price,
+                    quantity: qty,
+                    sku: sku,
+                    category: '',
+                    gstPercentage: 0.0,
+                    tax: 0.0,
+                    hsn: '',
+                    active: true,
+                    createdAt: DateTime.now(),
+                    updatedAt: DateTime.now(),
+                  );
+                  await repo.createProduct(newProduct);
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product added')));
+                } else {
+                  final updated = existing.copyWith(name: name, sku: sku, price: price, quantity: qty, updatedAt: DateTime.now());
+                  await repo.updateProduct(updated);
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product updated')));
+                }
+                Navigator.pop(context);
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Operation failed: $e')));
+              }
+            },
+            child: Text(existing == null ? 'Create' : 'Save'),
           ),
         ],
       ),
