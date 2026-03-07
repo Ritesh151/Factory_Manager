@@ -32,12 +32,17 @@ final expensesCacheProvider = FutureProvider((ref) async {
   }
 });
 
-/// Monthly expenses total
+/// Monthly expenses total (TODO: Implement this method in ExpenseService)
 final monthlyExpensesTotalProvider = FutureProvider.family<double, (int, int)>((ref, params) async {
   final service = ref.watch(expenseServiceProvider);
   final (year, month) = params;
   try {
-    return await service.getMonthlyExpensesTotal(year, month);
+    // TODO: Implement getMonthlyExpensesTotal in ExpenseService
+    // return await service.getMonthlyExpensesTotal(year, month);
+    final expenses = await ref.watch(expensesCacheProvider.future);
+    return expenses
+        .where((e) => e.date.year == year && e.date.month == month)
+        .fold<double>(0.0, (sum, expense) => sum + expense.amount);
   } catch (e) {
     throw Exception('Failed to fetch monthly expenses: $e');
   }

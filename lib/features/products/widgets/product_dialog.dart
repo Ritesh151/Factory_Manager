@@ -67,7 +67,7 @@ class _ProductDialogState extends State<ProductDialog> {
     setState(() => _isLoading = true);
 
     try {
-      Navigator.of(context).pop({
+      final productData = {
         'name': _nameController.text.trim(),
         'price': double.tryParse(_priceController.text) ?? 0.0,
         'discount': double.tryParse(_discountController.text) ?? 0.0,
@@ -76,7 +76,54 @@ class _ProductDialogState extends State<ProductDialog> {
         'stock': int.tryParse(_stockController.text) ?? 0,
         'imageUrl': _imageUrlController.text.trim().isEmpty ? null : _imageUrlController.text.trim(),
         'description': _descriptionController.text.trim(),
-      });
+      };
+
+      if (isEditing) {
+        // Update existing product
+        await widget.productService.updateProduct(
+          id: widget.product!.id,
+          name: productData['name'] as String,
+          price: productData['price'] as double,
+          discount: productData['discount'] as double?,
+          gstPercentage: productData['gstPercentage'] as double?,
+          hsnCode: productData['hsnCode'] as String?,
+          stock: productData['stock'] as int?,
+          imageUrl: productData['imageUrl'] as String?,
+          description: productData['description'] as String?,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product updated successfully')),
+          );
+        }
+      } else {
+        // Create new product
+        await widget.productService.createProduct(
+          name: productData['name'] as String,
+          price: productData['price'] as double,
+          discount: productData['discount'] as double,
+          gstPercentage: productData['gstPercentage'] as double,
+          hsnCode: productData['hsnCode'] as String,
+          stock: productData['stock'] as int,
+          imageUrl: productData['imageUrl'] as String?,
+          description: productData['description'] as String,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product added successfully')),
+          );
+        }
+      }
+      
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving product: $e')),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

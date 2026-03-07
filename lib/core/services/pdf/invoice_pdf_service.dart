@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../domain/entities/invoice_entity.dart';
 import '../../constants/company_info.dart';
 import 'pdf_font_service.dart';
+import 'pdf_currency_helper.dart';
 
 /// Service for generating professional invoice PDFs
 class InvoicePdfService {
@@ -234,7 +235,7 @@ class InvoicePdfService {
   static pw.Widget _buildItemsTable(InvoiceEntity invoice) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_IN',
-      symbol: '₹',
+      symbol: PdfCurrencyHelper.indianCurrencySymbol,
       decimalDigits: 2,
     );
 
@@ -364,7 +365,7 @@ class InvoicePdfService {
   static pw.Widget _buildTotals(InvoiceEntity invoice) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_IN',
-      symbol: '₹',
+      symbol: PdfCurrencyHelper.indianCurrencySymbol,
       decimalDigits: 2,
     );
 

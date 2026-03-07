@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/product.dart';
+import '../models/product_model.dart';
 import '../services/product_service.dart';
 import '../../../core/providers/firebase_provider.dart';
 
@@ -35,7 +35,7 @@ final lowStockProductsStreamProvider = StreamProvider((ref) {
 });
 
 /// Product search with caching
-final productSearchProvider = FutureProvider.family<List<Product>, String>((ref, query) async {
+final productSearchProvider = FutureProvider.family<List<ProductModel>, String>((ref, query) async {
   if (query.trim().isEmpty) {
     return [];
   }
@@ -53,7 +53,7 @@ final productSearchProvider = FutureProvider.family<List<Product>, String>((ref,
 });
 
 /// Product by ID provider
-final productByIdProvider = FutureProvider.family<Product?, String>((ref, productId) async {
+final productByIdProvider = FutureProvider.family<ProductModel?, String>((ref, productId) async {
   final products = await ref.watch(productsCacheProvider.future);
   try {
     return products.firstWhere((p) => p.id == productId);

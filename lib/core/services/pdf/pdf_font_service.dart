@@ -25,7 +25,7 @@ class PdfFontService {
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
-      fontFallback: [pw.Font.courier()], // Fallback for Unicode characters like ₹
+      fontFallback: [pw.Font.courier()], // Fallback for Unicode characters like \u20B9
     );
   }
   
